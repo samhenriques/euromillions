@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script type="text/javascript" src="./main.js"></script>
+	<script type="text/javascript" src="./extra-functions.js"></script>
+	<link rel="stylesheet" href="./databaseV2.css?version=2">
+	<title>Vm Ppa Work</title>
+</head>
+
+
+
+<!-- <body onload="loadDatabase()"> -->
+
+<body>
+
+
+
+	<a class="pageBtn" onclick="goToPage(this.innerHTML)" tabindex="-1">Create New Job</a>
+
+	<div class="h1">
+		<h1>Vm Ppa Work</h1>
+	</div>
+
+
+
+	<!-- 	            SEARCH FORM                         -->
+
+	<form name="form1" id="form1" class="form1" action="">
+
+		<!-- Year: -->
+		<select name="yearBtn" id="yearBtn" class="dropbtn">
+			<option value="" selected="selected">Select Year</option>
+		</select>
+		<br><br>
+
+		<!-- Client: -->
+		<select name="clientBtn" id="clientBtn" class="dropbtn">
+			<option value="" selected="selected">Select Client</option>
+		</select>
+		<br><br>
+
+		<!-- Program Name: -->
+		<select name="programNameBtn" id="programNameBtn" class="dropbtn">
+			<option value="" selected="selected">Select Program Name</option>
+		</select>
+		<br><br>
+
+		<!-- Episode Name: -->
+		<select name="episodeNameBtn" id="episodeNameBtn" class="dropbtn">
+			<option value="" selected="selected">Select Episode Name</option>
+		</select>
+
+		<input id="checkBox" type="checkbox" class="checkBox">
+		<label id="dateCreatedLable">Searching by Date Closed</label>
+		<br><br>
+		<br><br>
+		<div class="dateLabel"></div>
+		<label for="end">End Date:</label>
+		<label for="start">Start Date:</label>
+		<br><br>
+		<input type="date" id="dateEnd" name="dateEnd" value="" selected="selected" class="date">
+		<input type="date" id="dateStart" name="dateStart" value="" selected="selected" class="date">
+		<br><br>
+		<input type="submit" value="Refresh" class="dropbtn">
+	</form>
+
+	<!--              TABLE LIST             -->
+
+	<br><br>
+	<button type="button" class="btnDivHead">
+		<p class="headerCell" id="yearTd">Year</p>
+		<p class="headerCell" id="clientTd">Client</p>
+		<p class="headerCell" id="programNameTd">Program Name</p>
+		<p class="headerCell" id="episodeNameTd">Episode Name</p>
+		<p class="headerCell" id="dateCreatedTd">Date Created</p>
+		<p class="headerCell" id="dateClosedTd">Date Closed</p>
+		<p class="headerCell" id="jobStateTd">Job State</p>
+		<p class="headerCell" id="idTd">Id</p>
+	</button>
+
+
+	<!-- Job list, a buton for each job -->
+	<div id="btnDiv" class="btnDiv"></div>
+
+
+
+
+
+	<footer class="footer">
+		<p onclick="window.location.href='euromilhoes.html'">don't panic</p>
+	</footer>
+</body>
+
+</html>

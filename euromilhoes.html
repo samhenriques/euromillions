@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./databaseV2.css?version=2">
+    <title>Euromilholes</title>
+
+    <style>
+
+    </style>
+
+    <script>
+
+
+        /// LOAD JSON
+        function loadJSON(callback) {
+
+            let req = new XMLHttpRequest(callback);
+            req.onreadystatechange = () => {
+                if (req.readyState == XMLHttpRequest.DONE) {
+
+                    if (req.status === 200) {
+                        // Here the callback gets implemented
+                        let nasa = JSON.parse(req.responseText);
+
+                        ///  CALL BACK
+                        callback(nasa);
+                    } else {
+
+                    }
+                }
+            };
+
+            req.open("GET", "https://api.nasa.gov/planetary/apod?api_key=e8pqivTIeCbJvAwTgV6a4BFOVyBN5wqPfnY7hDV8", true);
+            /* req.setRequestHeader("secret-key", "$2b$10$SUWnPQUm5ViA5p9ASJ4bvefmiINTZCr1oghWTwmrEz17yun41HP7O"); */
+            req.send();
+        }
+
+
+        loadJSON(function getJsonFromServer(nasa) {
+
+            const bk = document.getElementsByTagName("body")[0]
+            bk.background = nasa.hdurl
+            bk.style.backgroundImage = nasa.hdurl;
+            bk.style.backgroundRepeat = "no-repeat center center fixed";
+
+            document.getElementsByTagName("h1")[0].innerHTML = nasa.title
+            document.getElementsByTagName("h2")[0].innerHTML = nasa.explanation
+
+        })
+
+
+        function getNumbers() {
+            const getKey = (min, max) => {
+
+                let loop
+                max === 50 ? loop = 5 : loop = 2
+                let key = []
+                const random = (min, max) => Math.floor(Math.random() * (max - min) + min)
+
+                let newNumber
+                while (true) {
+
+                    if (key.length != loop) {
+
+                        newNumber = random(min, max)
+
+                        if (!key.some(x => x === newNumber)) {
+                            key.push(newNumber)
+                        };
+
+                    } else if (key.length === loop) {
+                        break;
+                    };
+                };
+
+                return key.sort(function (a, b) { return a - b })
+            };
+
+            function generateEuromilhoes() {
+                const five = getKey(1, 50)
+                const stars = getKey(1, 12)
+                /*     return five + '    🤩   ' + stars */
+                return {
+                    numbers: five,
+                    stars: stars
+                }
+            }
+            const gen = generateEuromilhoes()
+            document.getElementById("td1").innerHTML = gen.numbers[0]
+            document.getElementById("td2").innerHTML = gen.numbers[1]
+            document.getElementById("td3").innerHTML = gen.numbers[2]
+            document.getElementById("td4").innerHTML = gen.numbers[3]
+            document.getElementById("td5").innerHTML = gen.numbers[4]
+
+            document.getElementById("td6").innerHTML = gen.stars[0]
+            document.getElementById("td7").innerHTML = gen.stars[1]
+        }
+
+
+
+        function actions() {
+
+            const buttonLinkBack = document.getElementById("button")
+            buttonLinkBack.addEventListener("mouseover", function () {
+
+                setInterval(function () {
+                    buttonLinkBack.innerHTML = "Go Back"
+                    buttonLinkBack.classList.add("button-long-hover");
+                    buttonLinkBack.onclick = function () {
+                        window.location.href = 'index.html'
+                    }
+                }, 4000);
+            })
+        }
+
+    </script>
+
+    <style>
+        .body {
+            background-color: rgb(0, 0, 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        /*     body {
+            background-color: rgb(108, 108, 108);
+        } */
+
+        * {
+            text-align: center;
+            font-size: 50px;
+        }
+
+        .div {
+            background-color: rgba(0, 0, 0, 0.31);
+            font-size: 20px;
+            color: rgb(204, 204, 204);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 4px;
+            max-width: 1400px;
+            min-width: 1400px;
+            height: 400px;
+            margin: auto;
+            margin-top: 0px;
+            display: block;
+            position: absolute;
+            top: 100px;
+        }
+
+        .divText {
+            background-color: rgba(0, 0, 0, 0.445);
+            font-size: 20px;
+            color: rgb(204, 204, 204);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 4px;
+            max-width: 1400px;
+            min-width: 1400px;
+            height: 400px;
+            margin: auto;
+            margin-top: 700px;
+            display: block;
+            position: relative;
+
+
+        }
+
+        .divText h1 {
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            font-size: 40px;
+            color: blanchedalmond;
+            margin-top: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .divText h2 {
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            font-size: 30px;
+            color: blanchedalmond;
+            width: 100%;
+            height: 100%;
+            display: table-cell;
+            text-align: inherit;
+            letter-spacing: 3px;
+            padding: 10px;
+        }
+
+        .table1 td {
+            text-align: center;
+
+            width: 250px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 50px;
+        }
+
+        .table2 td {
+            width: 135px;
+            text-align: center;
+            padding: 60px;
+            padding-left: 345px;
+            margin-top: 100px;
+        }
+
+        .button {
+            font-size: 30px;
+            border-style: none;
+            background-color: rgba(255, 99, 71, 0.762);
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            cursor: pointer;
+        }
+
+        .button:active {
+            transform: translateY(3px);
+        }
+
+        .button-long-hover {
+            background-color: rgba(74, 179, 57, 0.762);
+        }
+    </style>
+
+
+</head>
+
+<body class="body" onload="actions()">
+    <div class="div">
+        <div>
+            <table class="table1">
+                <th>
+                <td id="td1">_</td>
+                <td id="td2">_</td>
+                <td id="td3">_</td>
+                <td id="td4">_</td>
+                <td id="td5">_</td>
+                </th>
+            </table>
+        </div>
+
+        <div>
+            <table class="table2">
+                <th>
+                <td id="td6">*</td>
+                <td id="td7">*</td>
+                </th>
+            </table>
+        </div>
+        <br>
+        <button id="button" class="button" onclick="getNumbers()">Get Numbers</button>
+    </div>
+
+    <div class="divText">
+        <p id="text" class="text">
+        <h1></h1>
+        <h2></h2>
+        </p>
+    </div>
+
+
+
+
+
+</body>
+
+</html>
