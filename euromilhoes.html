@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="./databaseV2.css?version=2"> -->
+    <title>Euro - Milhões</title>
+
+    <script>
+        /// LOAD JSON
+        function loadJSON(callback) {
+
+
+
+            let req = new XMLHttpRequest(callback);
+
+            req.onreadystatechange = () => {
+                if (req.readyState == XMLHttpRequest.DONE) {
+
+                    if (req.status === 200) {
+
+                        // Here the callback gets implemented
+                        let nasa = JSON.parse(req.responseText);
+                        //console.log(nasa)
+                        ///  CALL BACK
+                        callback(nasa);
+                    } else {
+                        console.log(req.status)
+                    }
+                }
+            };
+            /* add &date=2022-09-22&  to end of link to get new date */
+            req.open("GET", "https://api.nasa.gov/planetary/apod/?api_key=VLS3BICJ3EYR1GDrQpREEPXNMaOtyhX7SiZOs3qN", true);
+            req.send();
+        }
+
+        function createImageDiv(source) {
+            const imageDiv = document.createElement("div")
+            imageDiv.className = "image-background"
+            imageDiv.innerHTML = `
+                    <img src="${source}" alt="">
+                    `
+            document.body.appendChild(imageDiv)
+        }
+
+        /**
+        * @param {Object} nasa
+        */
+        loadJSON(function getJsonFromServer(nasa) {
+
+
+            // Title link to picture
+            const title = document.getElementsByTagName("h1")[0]
+            title.innerHTML = nasa.title
+            title.addEventListener("click", function () {
+                window.open(nasa.hdurl || nasa.url, '_blank')
+            })
+
+            // Copyright
+            document.getElementsByTagName("h2")[0].innerHTML = nasa.explanation
+            if (nasa.hasOwnProperty('copyright')) {
+                document.getElementsByTagName("h3")[0].innerHTML = "Copyright: " + nasa.copyright
+            }
+
+            // Nasa Link
+            const nasaLink = document.getElementsByTagName("h4")[0]
+            nasaLink.addEventListener("click", function () {
+                window.open("https://apod.nasa.gov/apod/astropix.html", '_blank')
+            })
+
+            if (nasa.media_type === "video") {
+
+                const videoDiv = document.createElement("div")
+                videoDiv.className = "video-background"
+
+                videoDiv.innerHTML = `
+                <div class="video-foreground">
+                <iframe src="${nasa.url}?&playlist=${nasa.url.split("/").slice(-1)[0].split("?")[0]}&autoplay=1&mute=1&loop=1&controls=0" frameborder="0" allow="autoplay"
+                </iframe>
+                </div>
+                 `
+                document.body.appendChild(videoDiv)
+
+            } else if (nasa.media_type === "image") {
+
+                if (nasa.hasOwnProperty('hdurl')) {
+                    createImageDiv(nasa.hdurl)
+                } else {
+                    createImageDiv(nasa.url)
+                }
+            }
+        })
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function runEMGenerator() {
+
+            /**
+            * @param {number} min - lower random number
+            * @param {number} max - highest random number
+            */
+            const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min) + min)
+
+            // /**
+            // *@param {array} = arr - array of numbers
+            // */
+            // function sumInInterval(arr) {
+            //     const sumArr = arr.reduce((a, b) => a + b)
+            //     return sumArr >= 90 && sumArr <= 160
+            // };
+
+
+            /**
+            * @param {number} amount
+            * @param {number} max
+            */
+            function getNumberArr(amount, max, arr = []) {
+
+                const nType = amount === 5 ? "numbers" : "stars"
+
+                // Return if 2 Stars
+                if (amount === 2 && arr.length === amount) {
+                    const finalStars = arr.sort((a, b) => a - b);
+                    // If pattern is not true, clear array and start over
+                    console.log(`final stars\narr: ${finalStars.toString()}\ntype: ${nType}\nmax: ${max}`)
+                    return finalStars;
+                    // return getNumberArr(2, 12, arr = []); 
+                };
+
+                // Return if 5 Numbers
+                if (amount === 5 && arr.length === amount) {
+                    const finalNumbers = arr.sort((a, b) => a - b);
+
+                    console.log(`final numbers\narr: ${finalNumbers.toString()}\ntype: ${nType}\nmax: ${max}`)
+                    // If pattern is not true and its not within the sum interval, clear array and start over
+                    return finalNumbers
+                    /*    console.log("try numbers again")
+                       return getNumberArr(5, 50, arr = []); */
+                };
+
+                // log events
+                console.log(`arr: ${arr.toString()}\ntype: ${nType}\nmax: ${max}`)
+
+                //Get random number
+                let newNumber
+                if (amount === 2) newNumber = getRandomNumber(1, 12);
+                if (amount === 5) newNumber = getRandomNumber(1, 50);
+
+                //Number can't be consecutive or con-consecutive
+                if (arr.includes(newNumber + 1) || arr.includes(newNumber - 1)) {
+                    return getNumberArr(amount, max, arr)
+                };
+
+                //Number can't repeat
+                if (!arr.includes(newNumber)) {
+                    arr.push(newNumber)
+                    return getNumberArr(amount, max, arr)
+                };
+                return getNumberArr(amount, max, arr)
+            };
+
+
+
+
+            function generateEuromilhoes() {
+
+                const five = getNumberArr(5, 50)
+                const stars = getNumberArr(2, 12)
+                return {
+                    numbers: five,
+                    stars: stars
+                };
+            };
+
+
+            const gen = generateEuromilhoes();
+
+
+            // Set value on HTML elements
+            document.getElementById("td1").innerHTML = gen.numbers[0]
+            document.getElementById("td2").innerHTML = gen.numbers[1]
+            document.getElementById("td3").innerHTML = gen.numbers[2]
+            document.getElementById("td4").innerHTML = gen.numbers[3]
+            document.getElementById("td5").innerHTML = gen.numbers[4]
+
+            document.getElementById("td6").innerHTML = gen.stars[0]
+            document.getElementById("td7").innerHTML = gen.stars[1]
+        }
+
+    </script>
+
+    <style>
+        .body {
+            background-color: rgb(48, 48, 48);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        * {
+            text-align: center;
+            font-size: 55px;
+
+        }
+
+        .video-background,
+        .image-background {
+            background: #000;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: -99;
+        }
+
+        .video-foreground,
+        .video-background iframe,
+        .image-background img {
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+
+        .div {
+            font-size: 20px;
+            color: rgb(204, 204, 204);
+            border-radius: 4px;
+            width: 100%;
+            height: 500%;
+            margin: auto;
+            margin-top: 0px;
+            display: block;
+            position: absolute;
+            top: 120px;
+        }
+
+
+        .divnumbersBox {
+            background-color: rgba(0, 0, 0, .35);
+            border-radius: 4px;
+            width: 100%;
+            height: 550px;
+            margin-top: 0px;
+            display: block;
+            position: absolute;
+            top: 120px;
+        }
+
+        .divText {
+            background-color: rgba(0, 0, 0, 0.445);
+            font-size: 20px;
+            color: rgb(204, 204, 204);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 0px;
+            width: 100%;
+            margin-top: 1000px;
+            display: block;
+            position: relative;
+        }
+
+        .divText h1 {
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            font-size: 40px;
+            color: rgb(255, 248, 239);
+            margin-top: 30px;
+            margin-bottom: 60px;
+            margin-left: 10px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .divText h2 {
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            font-size: 30px;
+            color: rgb(255, 248, 239);
+            width: 100%;
+            height: 100%;
+            display: table-cell;
+            text-align: center;
+            letter-spacing: 3px;
+            padding: 10px;
+
+        }
+
+        .divText h3 {
+            font-family: 'Courier New', monospace;
+            font-weight: 100;
+            font-size: 20px;
+            color: rgb(255, 248, 239);
+            margin-top: 30px;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+
+        .divText h4 {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .table1 td {
+            font-family: 'Courier New', monospace;
+            letter-spacing: -9px;
+            width: 1500em;
+            padding-top: 50px;
+        }
+
+        .table2 td {
+            font-family: 'Courier New', monospace;
+            width: 1500em;
+            padding: 60px;
+            margin-top: 100px;
+        }
+
+        .button {
+            font-size: 30px;
+            border-style: none;
+            background-color: rgba(255, 99, 71, 0.762);
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            cursor: pointer;
+        }
+
+        .button:active {
+            transform: translateY(3px);
+        }
+
+        .button-long-hover {
+            background-color: rgba(74, 179, 57, 0.762);
+        }
+    </style>
+</head>
+
+<body class="body">
+    <div class="div">
+        <div class="divnumbersBox">
+            <div>
+                <table class="table1">
+                    <th>
+                    <td id="td1">_</td>
+                    <td id="td2">_</td>
+                    <td id="td3">_</td>
+
+                    <td id="td4">_</td>
+                    <td id="td5">_</td>
+                    </th>
+                </table>
+            </div>
+            <div>
+                <table class="table2">
+                    <th>
+                    <td id="td6">*</td>
+                    <td id="td7">*</td>
+                    </th>
+                </table>
+            </div>
+            <br>
+            <button id="button" class="button" onclick="runEMGenerator()">Get Numbers</button>
+        </div>
+    </div>
+    <div class="divText">
+        <p id="text" class="text">
+        <h1></h1>
+        <h3></h3>
+        <h2></h2>
+        </p>
+        <br>
+        <p>
+        <h4>NASA</h4>
+        </p>
+    </div>
+</body>
+</html>
