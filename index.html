@@ -5,429 +5,236 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="stylesheet" href="./databaseV2.css?version=2"> -->
     <title>Euro - Milhões</title>
 
     <script>
-        /// LOAD JSON
         function loadJSON(callback) {
-
-
-
-            let req = new XMLHttpRequest(callback);
-
+            let req = new XMLHttpRequest();
             req.onreadystatechange = () => {
                 if (req.readyState == XMLHttpRequest.DONE) {
-
                     if (req.status === 200) {
-
-                        // Here the callback gets implemented
                         let nasa = JSON.parse(req.responseText);
-                        //console.log(nasa)
-                        ///  CALL BACK
                         callback(nasa);
                     } else {
                         console.log(req.status)
                     }
                 }
             };
-            /* add &date=2022-09-22&  to end of link to get new date */
-            req.open("GET", "https://api.nasa.gov/planetary/apod/?api_key=VLS3BICJ3EYR1GDrQpREEPXNMaOtyhX7SiZOs3qN",
-                true);
+            req.open("GET", "https://api.nasa.gov/planetary/apod/?api_key=VLS3BICJ3EYR1GDrQpREEPXNMaOtyhX7SiZOs3qN", true);
             req.send();
         }
 
         function createImageDiv(source) {
             const imageDiv = document.createElement("div")
             imageDiv.className = "image-background"
-            imageDiv.innerHTML = `
-                    <img src="${source}" alt="">
-                    `
+            imageDiv.innerHTML = `<img src="${source}" alt="">`
             document.body.appendChild(imageDiv)
         }
 
-        /**
-         * @param {Object} nasa
-         */
         loadJSON(function getJsonFromServer(nasa) {
-
-
-            // Title link to picture
             const title = document.getElementsByTagName("h1")[0]
             title.innerHTML = nasa.title
             title.addEventListener("click", function () {
                 window.open(nasa.hdurl || nasa.url, '_blank')
             })
 
-            // Copyright
             document.getElementsByTagName("h2")[0].innerHTML = nasa.explanation
             if (nasa.hasOwnProperty('copyright')) {
                 document.getElementsByTagName("h3")[0].innerHTML = "Copyright: " + nasa.copyright
             }
 
-            // Nasa Link
             const nasaLink = document.getElementsByTagName("h4")[0]
             nasaLink.addEventListener("click", function () {
                 window.open("https://apod.nasa.gov/apod/astropix.html", '_blank')
             })
 
             if (nasa.media_type === "video") {
-
                 const videoDiv = document.createElement("div")
                 videoDiv.className = "video-background"
-
                 videoDiv.innerHTML = `
                 <div class="video-foreground">
-                <iframe src="${nasa.url}?&playlist=${nasa.url.split("/").slice(-1)[0].split("?")[0]}&autoplay=1&mute=1&loop=1&controls=0" frameborder="0" allow="autoplay"
-                </iframe>
-                </div>
-                 `
+                <iframe src="${nasa.url}?&playlist=${nasa.url.split("/").slice(-1)[0].split("?")[0]}&autoplay=1&mute=1&loop=1&controls=0" frameborder="0" allow="autoplay"></iframe>
+                </div>`
                 document.body.appendChild(videoDiv)
-
             } else if (nasa.media_type === "image") {
-
-                if (nasa.hasOwnProperty('hdurl')) {
-                    createImageDiv(nasa.hdurl)
-                } else {
-                    createImageDiv(nasa.url)
-                }
+                createImageDiv(nasa.hdurl || nasa.url)
             }
         })
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         function runEMGenerator() {
+            const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-            /**
-             * @param {number} min - lower random number
-             * @param {number} max - highest random number
-             */
-            const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min) + min)
+            function getNumberArr(amount, max) {
+                let arr = [];
+                while (arr.length < amount) {
+                    let newNumber = getRandomNumber(1, max);
+                    // Check for repeats and consecutive numbers
+                    if (!arr.includes(newNumber) && !arr.includes(newNumber + 1) && !arr.includes(newNumber - 1)) {
+                        arr.push(newNumber);
+                    }
+                }
+                return arr.sort((a, b) => a - b);
+            }
 
-            // /**
-            // *@param {array} = arr - array of numbers
-            // */
-            // function sumInInterval(arr) {
-            //     const sumArr = arr.reduce((a, b) => a + b)
-            //     return sumArr >= 90 && sumArr <= 160
-            // };
+            const numbers = getNumberArr(5, 50);
+            const stars = getNumberArr(2, 12);
 
-
-            /**
-             * @param {number} amount
-             * @param {number} max
-             */
-            function getNumberArr(amount, max, arr = []) {
-
-                const nType = amount === 5 ? "numbers" : "stars"
-
-                // Return if 2 Stars
-                if (amount === 2 && arr.length === amount) {
-                    const finalStars = arr.sort((a, b) => a - b);
-                    // If pattern is not true, clear array and start over
-                    console.log(`final stars\narr: ${finalStars.toString()}\ntype: ${nType}\nmax: ${max}`)
-                    return finalStars;
-                    // return getNumberArr(2, 12, arr = []); 
-                };
-
-                // Return if 5 Numbers
-                if (amount === 5 && arr.length === amount) {
-                    const finalNumbers = arr.sort((a, b) => a - b);
-
-                    console.log(`final numbers\narr: ${finalNumbers.toString()}\ntype: ${nType}\nmax: ${max}`)
-                    // If pattern is not true and its not within the sum interval, clear array and start over
-                    return finalNumbers
-                    /*    console.log("try numbers again")
-                       return getNumberArr(5, 50, arr = []); */
-                };
-
-                // log events
-                console.log(`arr: ${arr.toString()}\ntype: ${nType}\nmax: ${max}`)
-
-                //Get random number
-                let newNumber
-                if (amount === 2) newNumber = getRandomNumber(1, 12);
-                if (amount === 5) newNumber = getRandomNumber(1, 50);
-
-                //Number can't be consecutive or con-consecutive
-                if (arr.includes(newNumber + 1) || arr.includes(newNumber - 1)) {
-                    return getNumberArr(amount, max, arr)
-                };
-
-                //Number can't repeat
-                if (!arr.includes(newNumber)) {
-                    arr.push(newNumber)
-                    return getNumberArr(amount, max, arr)
-                };
-                return getNumberArr(amount, max, arr)
-            };
-
-
-
-
-            function generateEuromilhoes() {
-
-                const five = getNumberArr(5, 50)
-                const stars = getNumberArr(2, 12)
-                return {
-                    numbers: five,
-                    stars: stars
-                };
-            };
-
-
-            const gen = generateEuromilhoes();
-
-            var table1Cells = document.querySelectorAll('.table1 td');
-            var table2Cells = document.querySelectorAll('.table2 td');
-            table1Cells.forEach(el => el.classList.add("shadow"))
-            table2Cells.forEach(el => el.classList.add("shadow"))
-
-
-
-            // Set value on HTML elements
-            document.getElementById("td1").innerHTML = gen.numbers[0]
-            document.getElementById("td2").innerHTML = gen.numbers[1]
-            document.getElementById("td3").innerHTML = gen.numbers[2]
-            document.getElementById("td4").innerHTML = gen.numbers[3]
-            document.getElementById("td5").innerHTML = gen.numbers[4]
-
-            document.getElementById("td6").innerHTML = gen.stars[0]
-            document.getElementById("td7").innerHTML = gen.stars[1]
+            for (let i = 0; i < 5; i++) {
+                document.getElementById(`td${i + 1}`).innerHTML = numbers[i];
+                document.getElementById(`td${i + 1}`).classList.add("shadow");
+            }
+            for (let i = 0; i < 2; i++) {
+                document.getElementById(`td${i + 6}`).innerHTML = stars[i];
+                document.getElementById(`td${i + 6}`).classList.add("shadow");
+            }
         }
     </script>
 
     <style>
-        .body {
-            background-color: rgb(48, 48, 48);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-            background-repeat: no-repeat;
-        }
-
-        /* Hide scrollbars */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-
+        /* RESET & BASE */
         * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             text-align: center;
-            font-size: 55px;
-
         }
 
-        .video-background,
-        .image-background {
-            background: #000;
+        body {
+            background-color: rgb(48, 48, 48);
+            font-family: 'Courier New', monospace;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* BACKGROUNDS */
+        .video-background, .image-background {
             position: fixed;
             top: 0;
-            right: 0;
-            bottom: 0;
             left: 0;
-            z-index: -99;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #000;
         }
 
-        .video-foreground,
-        .video-background iframe,
-        .image-background img {
+        .video-background iframe, .image-background img {
+            width: 100vw;
+            height: 100vh;
             object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
         }
 
-
-        .div {
-            font-size: 20px;
-            color: rgb(204, 204, 204);
-            width: 100%;
-            height: 500%;
-            margin: auto;
-            margin: 30px;
-            display: block;
-            position: absolute;
-            top: 120px;
-
+        /* MAIN CONTAINER */
+        .main-container {
+            width: 95%;
+            max-width: 800px;
+            margin: 40px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-
-        .divnumbersBox {
-            background-color: rgba(0, 0, 0, .35);
-            border-radius: 4px;
-            width: 100%;
-            height: 550px;
-            margin-top: 0px;
-            display: block;
-            position: absolute;
-            top: 120px;
-
-
-
+        /* GENERATOR BOX */
+        .numbers-box {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
 
-        .divText {
-            background-color: rgba(0, 0, 0, 0.445);
-            font-size: 20px;
-            color: rgb(204, 204, 204);
-
-            border-radius: 0px;
-            width: 100%;
-            margin-top: 1000px;
-            display: block;
-            position: relative;
+        table {
+            margin: 20px auto;
+            border-collapse: separate;
+            border-spacing: 10px;
         }
 
-        .divnumbersBox,
-        .divText {
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-        }
-
-        .divText h1 {
-            font-family: 'Courier New', monospace;
-            font-weight: 100;
-            font-size: 40px;
-            color: rgb(255, 248, 239);
-            margin-top: 30px;
-            margin-bottom: 60px;
-            margin-left: 10px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .divText h2 {
-            font-family: 'Courier New', monospace;
-            font-weight: 100;
-            font-size: 30px;
-            color: rgb(255, 248, 239);
-            width: 100%;
-            height: 100%;
-            display: table-cell;
-            text-align: center;
-            letter-spacing: 3px;
-            padding: 10px;
-
-        }
-
-        .divText h3 {
-            font-family: 'Courier New', monospace;
-            font-weight: 100;
-            font-size: 20px;
-            color: rgb(255, 248, 239);
-            margin-top: 30px;
-            margin-left: 10px;
-            margin-right: 10px;
-        }
-
-
-        .divText h4 {
-            font-family: 'Courier New', monospace;
-            letter-spacing: 10px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-
-
-        .table1,
-        .table2 {
-            margin: auto;
-            margin-top: 10px;
-            width: 50%;
-            min-height: 130px;
-        }
-
-        .table1 {
-            margin-top: 50px;
-        }
-
-        .table1 td,
-        .table2 td {
-            font-family: 'Courier New', monospace;
-            padding-left: 50px;
-            padding-right: 50px;
-            padding-bottom: 30px;
-            border-radius: 30px;
-            padding-top: 30px;
+        td {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            vertical-align: middle;
             opacity: 0;
-            /*   box-shadow: 0 1px 5px 5px rgba(80, 80, 80, 0.108); */
+            transition: opacity 0.5s, transform 0.3s;
+        }
+
+        .table2 td {
+            background: rgba(255, 215, 0, 0.2); /* Gold tint for stars */
+            border: 1px solid rgba(255, 215, 0, 0.4);
         }
 
         .shadow {
-            transition: all 1s;
-            box-shadow: 0 1px 5px 5px rgba(80, 80, 80, 0.248);
-            opacity: 1 !important;
+            opacity: 1;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
         }
 
-        .table1 td {
-            min-width: 80px;
-        }
-
-        .table2 td {
-            min-width: 80px;
-            border-radius: 500px;
-        }
-
-
+        /* BUTTON */
         .button {
-            font-size: 30px;
-            border-style: none;
-            background-color: rgba(255, 99, 71, 0.762);
-            padding: 20px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            border-radius: 10px;
-        }
-
-        .button:hover {
+            font-size: 20px;
+            padding: 15px 30px;
             cursor: pointer;
-            filter: brightness(1.1);
+            border: none;
+            border-radius: 50px;
+            background-color: #ff6347;
+            color: white;
+            transition: 0.3s;
+            margin-top: 10px;
         }
 
-        .button:active {
-            transform: translateY(3px);
+        .button:active { transform: scale(0.95); }
+
+        /* NASA TEXT AREA */
+        .nasa-info {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            line-height: 1.6;
+        }
+
+        h1 { font-size: 28px; margin-bottom: 15px; cursor: pointer; color: #ffebcd; }
+        h2 { font-size: 16px; font-weight: normal; margin: 15px 0; text-align: justify; }
+        h3 { font-size: 14px; opacity: 0.8; }
+        h4 { font-size: 18px; margin-top: 20px; cursor: pointer; letter-spacing: 5px; }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 600px) {
+            td { width: 40px; height: 40px; font-size: 18px; }
+            h1 { font-size: 22px; }
+            table { border-spacing: 5px; }
+            .main-container { margin: 20px auto; }
         }
     </style>
 </head>
 
-<body class="body">
-    <div class="div">
-        <div class="divnumbersBox">
-            <div>
-                <table class="table1">
+<body>
+    <div class="main-container">
+        <div class="numbers-box">
+            <table class="table1">
+                <tr>
                     <td id="td1"></td>
                     <td id="td2"></td>
                     <td id="td3"></td>
                     <td id="td4"></td>
                     <td id="td5"></td>
-                </table>
-            </div>
-            <div>
-                <table class="table2">
+                </tr>
+            </table>
+            <table class="table2">
+                <tr>
                     <td id="td6"></td>
                     <td id="td7"></td>
-                </table>
-            </div>
-            <br>
-            <button id="button" class="button" onclick="runEMGenerator()">Get Numbers</button>
+                </tr>
+            </table>
+            <button class="button" onclick="runEMGenerator()">Get Numbers</button>
         </div>
-    </div>
-    <div class="divText">
-        <p id="text" class="text">
+
+        <div class="nasa-info">
             <h1></h1>
             <h3></h3>
             <h2></h2>
-        </p>
-        <br>
-        <p>
-            <h4>NASA</h4>
-        </p>
+            <h4>NASA APOD</h4>
+        </div>
     </div>
 </body>
 
