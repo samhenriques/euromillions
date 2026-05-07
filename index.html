@@ -108,7 +108,8 @@
         }
 
         /* BACKGROUNDS */
-        .video-background, .image-background {
+        .video-background,
+        .image-background {
             position: fixed;
             top: 0;
             left: 0;
@@ -118,7 +119,8 @@
             background: #000;
         }
 
-        .video-background iframe, .image-background img {
+        .video-background iframe,
+        .image-background img {
             width: 100vw;
             height: 100vh;
             object-fit: cover;
@@ -139,7 +141,7 @@
             background-color: rgba(0, 0, 0, 0.6);
             padding: 30px 15px;
             border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         table {
@@ -149,11 +151,14 @@
         }
 
         td {
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            /* Increased from 50px */
+            height: 80px;
+            /* Increased from 50px */
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 40px;
+            /* Increased font size */
             font-weight: bold;
             vertical-align: middle;
             opacity: 0;
@@ -161,13 +166,14 @@
         }
 
         .table2 td {
-            background: rgba(255, 215, 0, 0.2); /* Gold tint for stars */
+            background: rgba(255, 215, 0, 0.2);
+            /* Gold tint for stars */
             border: 1px solid rgba(255, 215, 0, 0.4);
         }
 
         .shadow {
             opacity: 1;
-            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         /* BUTTON */
@@ -183,7 +189,9 @@
             margin-top: 10px;
         }
 
-        .button:active { transform: scale(0.95); }
+        .button:active {
+            transform: scale(0.95);
+        }
 
         /* NASA TEXT AREA */
         .nasa-info {
@@ -193,17 +201,53 @@
             line-height: 1.6;
         }
 
-        h1 { font-size: 28px; margin-bottom: 15px; cursor: pointer; color: #ffebcd; }
-        h2 { font-size: 16px; font-weight: normal; margin: 15px 0; text-align: justify; }
-        h3 { font-size: 14px; opacity: 0.8; }
-        h4 { font-size: 18px; margin-top: 20px; cursor: pointer; letter-spacing: 5px; }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            color: #ffebcd;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: normal;
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        h3 {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        h4 {
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            letter-spacing: 5px;
+        }
 
         /* MOBILE OPTIMIZATION */
         @media (max-width: 600px) {
-            td { width: 40px; height: 40px; font-size: 18px; }
-            h1 { font-size: 22px; }
-            table { border-spacing: 5px; }
-            .main-container { margin: 20px auto; }
+            td {
+                width: 60px;
+                /* Adjusted for mobile screens */
+                height: 60px;
+                font-size: 30px;
+                /* Larger mobile font */
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            table {
+                border-spacing: 8px;
+            }
+
+            .main-container {
+                margin: 10px auto;
+            }
         }
     </style>
 </head>
