@@ -8,56 +8,91 @@
     <title>Euro - Milhões</title>
 
     <script>
-        function loadJSON(callback) {
-            let req = new XMLHttpRequest();
-            req.onreadystatechange = () => {
-                if (req.readyState == XMLHttpRequest.DONE) {
-                    if (req.status === 200) {
-                        let nasa = JSON.parse(req.responseText);
-                        callback(nasa);
-                    } else {
-                        console.log(req.status)
-                    }
-                }
-            };
-            req.open("GET", "https://api.nasa.gov/planetary/apod/?api_key=VLS3BICJ3EYR1GDrQpREEPXNMaOtyhX7SiZOs3qN", true);
-            req.send();
+        // NASA moved APOD to science.nasa.gov in Sept 2026. This endpoint needs no API key.
+        const APOD_URL = "https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=1";
+
+        async function fetchApod() {
+            const res = await fetch(APOD_URL);
+            if (!res.ok) throw new Error("NASA API returned HTTP " + res.status);
+            const data = await res.json();
+            // The collection endpoint returns an array (newest first); a single-date route returns an object
+            const item = Array.isArray(data) ? data[0] : data;
+            if (!item) throw new Error("NASA API returned no APOD entries");
+            return item;
+        }
+
+        const looksLikeImage = (u) => typeof u === "string" && /\.(jpe?g|png|gif|webp)(\?|$)/i.test(u);
+
+        function toEmbedUrl(u) {
+            if (typeof u !== "string") return null;
+            let m = u.match(/youtube\.com\/watch\?v=([\w-]+)/) || u.match(/youtu\.be\/([\w-]+)/) || u.match(/youtube\.com\/embed\/([\w-]+)/);
+            if (m) return "https://www.youtube.com/embed/" + m[1];
+            m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+            if (m) return "https://player.vimeo.com/video/" + m[1];
+            return null;
         }
 
         function createImageDiv(source) {
             const imageDiv = document.createElement("div")
             imageDiv.className = "image-background"
-            imageDiv.innerHTML = `<img src="${source}" alt="">`
+            const img = document.createElement("img")
+            img.src = source
+            img.alt = ""
+            imageDiv.appendChild(img)
             document.body.appendChild(imageDiv)
         }
 
-        loadJSON(function getJsonFromServer(nasa) {
+        function plainText(html) {
+            const d = document.createElement("div")
+            d.innerHTML = html || ""
+            return d.textContent.trim()
+        }
+
+        function renderApod(nasa) {
+            console.log("APOD data:", nasa)
+            const pageLink = nasa.permalink || nasa.url || nasa.hdurl
+
             const title = document.getElementsByTagName("h1")[0]
-            title.innerHTML = nasa.title
+            title.textContent = plainText(nasa.title && nasa.title.rendered ? nasa.title.rendered : nasa.title)
             title.addEventListener("click", function () {
-                window.open(nasa.hdurl || nasa.url, '_blank')
+                if (pageLink) window.open(pageLink, '_blank')
             })
 
-            document.getElementsByTagName("h2")[0].innerHTML = nasa.explanation
-            if (nasa.hasOwnProperty('copyright')) {
-                document.getElementsByTagName("h3")[0].innerHTML = "Copyright: " + nasa.copyright
+            const explanation = nasa.explanation || ""
+            document.getElementsByTagName("h2")[0].textContent = plainText(explanation)
+            if (nasa.copyright) {
+                document.getElementsByTagName("h3")[0].textContent = "Copyright: " + plainText(nasa.copyright)
             }
 
             const nasaLink = document.getElementsByTagName("h4")[0]
             nasaLink.addEventListener("click", function () {
-                window.open("https://apod.nasa.gov/apod/astropix.html", '_blank')
+                window.open("https://science.nasa.gov/apod/", '_blank')
             })
 
-            if (nasa.media_type === "video") {
+            const imageSrc = looksLikeImage(nasa.hdurl) ? nasa.hdurl : (looksLikeImage(nasa.url) ? nasa.url : (nasa.hdurl || null))
+            const embed = nasa.media_type === "video" ? (toEmbedUrl(nasa.url) || toEmbedUrl(nasa.hdurl)) : null
+
+            if (embed) {
+                const id = embed.split("/").pop()
                 const videoDiv = document.createElement("div")
                 videoDiv.className = "video-background"
                 videoDiv.innerHTML = `
                 <div class="video-foreground">
-                <iframe src="${nasa.url}?&playlist=${nasa.url.split("/").slice(-1)[0].split("?")[0]}&autoplay=1&mute=1&loop=1&controls=0" frameborder="0" allow="autoplay"></iframe>
+                <iframe src="${embed}?playlist=${id}&autoplay=1&mute=1&loop=1&controls=0" frameborder="0" allow="autoplay"></iframe>
                 </div>`
                 document.body.appendChild(videoDiv)
-            } else if (nasa.media_type === "image") {
-                createImageDiv(nasa.hdurl || nasa.url)
+            } else if (imageSrc) {
+                createImageDiv(imageSrc)
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                renderApod(await fetchApod())
+            } catch (err) {
+                console.error(err)
+                document.getElementsByTagName("h1")[0].textContent = "Could not load NASA data"
+                document.getElementsByTagName("h2")[0].textContent = String(err.message || err)
             }
         })
 
