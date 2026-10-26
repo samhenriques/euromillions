@@ -96,6 +96,20 @@
             }
         })
 
+        // Fade out the generator and text while scrolling, to reveal the clean background
+        function setupScrollFade() {
+            const content = document.querySelector(".main-container")
+            const update = () => {
+                const fadeDistance = window.innerHeight * 0.6
+                const opacity = Math.max(0, 1 - window.scrollY / fadeDistance)
+                content.style.opacity = opacity
+                content.style.pointerEvents = opacity < 0.1 ? "none" : "auto"
+            }
+            window.addEventListener("scroll", update, { passive: true })
+            update()
+        }
+        document.addEventListener("DOMContentLoaded", setupScrollFade)
+
         function runEMGenerator() {
             const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
@@ -262,6 +276,11 @@
             letter-spacing: 5px;
         }
 
+        /* SCROLL SPACE: extra height so you can scroll down to the clean image */
+        .scroll-spacer {
+            height: 100vh;
+        }
+
         /* MOBILE OPTIMIZATION */
         @media (max-width: 600px) {
             td {
@@ -315,6 +334,7 @@
             <h4>NASA APOD</h4>
         </div>
     </div>
+    <div class="scroll-spacer"></div>
 </body>
 
 </html>
